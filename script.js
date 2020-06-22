@@ -52,7 +52,7 @@ function getTracks(pageContent) {
     let currentState = ""
     let currentTrack = ""
 
-    let pageDoc = new DOMParser().parseFromString(pageContent)
+    let pageDoc = new DOMParser().parseFromString(pageContent, 'text/html')
     console.log(pageDoc)
     let tracks = Array.from(pageDoc.getElementsByClassName("chart_row-content-title")).map(t => t.textContent.trim().slice(0, -1*("Lyrics").length).trim())
 
