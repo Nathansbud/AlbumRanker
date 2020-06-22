@@ -4,9 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Album Ranker</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <button id="test_button">Testing 123</button>
+    <div id="intro">
+    <form id="album-form" action="javascript:void(0);">
+        <label for="artist">Artist</label>
+        <input name="artist" placeholder="e.g. Feed Me Jack" type="text"/><br>
+        <label for="album">Album</label>
+        <input name="album" placeholder="e.g. Chumpfrey" type="text"/><br>
+        <input type="submit" value="Start Comparing">
+    </form>
+    <br>
+    <div id="loading" class="hidden">
+        <b><span>Loading Tracks...</span></b><br>
+        <div class="loading-animation lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+    </div>
+    </div>
+    <div class="hidden" id="bracket"> 
+        <h2 id="battle-title"><i><span class="album-name"></i></span> Song Ranker</h2>
+        <p>(<span id="battle-tracks"></span>)</p>
+        <table id="battle-table">
+           <tr>
+                <td rowspan="2" class="battle-option" id="battle-left">Dad</td>
+                <td id="option-both">Both</td>
+                <td rowspan="2" class="battle-option" id="battle-right">Daddy</td>
+           </tr>
+           <tr>
+               <td id="option-neither">No Opinion</td>
+           </tr>
+        </table>
+        <ul id='song-list'>
+            
+        </ul>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
