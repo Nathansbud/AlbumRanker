@@ -49,10 +49,10 @@ function hasClass(attributes, className) {
 function getTracks(pageContent) {
     let currentState = ""
     let currentTrack = ""
-    let tracks = []
 
     let pageDoc = new DOMParser().parseFromString(pageContent)
+    console.log(pageDoc)
     let tracks = Array.from(pageDoc.getElementsByClassName("chart_row-content-title")).map(t => t.textContent.trim().slice(0, -1*("Lyrics").length).trim())
 
-    return tracks
+    return tracks   
 }
