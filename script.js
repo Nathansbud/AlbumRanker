@@ -5,27 +5,24 @@ const NOT_FOUND = 404
 
 var testButton = document.getElementById("test_button")
 testButton.addEventListener('click', function() {
-    getAlbum()
+    startApp()
 })
 
-function getAlbum(artist="Feed Me Jack", album="Chumpfrey") { 
+
+async function getAlbumTracks(artist="Feed Me Jack", album="Chumpfrey") {
     album = geniusClean(album)
     artist = geniusClean(artist)
-    
-    let xhr = new XMLHttpRequest()
-    xhr.open("GET", `https://cors-anywhere.herokuapp.com/https://genius.com/albums/${artist}/${album}`)
-    xhr.onreadystatechange = function() {
-        if(xhr.readyState === DONE) {
-            if(xhr.status === OK) {
-                console.log(getTracks(xhr.responseText))
-            } else if(xhr.status === NOT_FOUND) {
-                console.log(`Album ${album} by ${artist} not found!`)
-            } else {
-                console.log(`Error: ${xhr.status}`)
-            }
-        }
-    }
-    xhr.send(null)
+
+    //probably shouldn't use cors-anywhere but idk why it ain't working from ghd
+    const response = await fetch(`https://cors-anywhere.herokuapp.com/https://genius.com/albums/${artist}/${album}`)
+    const pageContent = new DOMParser().parseFromString(await response.text(), 'text/html')
+    let tracks = Array.from(pageContent.getElementsByClassName("chart_row-content-title")).map(t => t.textContent.trim().slice(0, -1*("Lyrics").length).trim())
+    return tracks
+}
+
+async function startApp() {
+    let tracks = await getAlbumTracks()
+    console.log(tracks)
 }
   
 function geniusClean(fi) {
@@ -44,17 +41,6 @@ function geniusClean(fi) {
 }
 
 
-function hasClass(attributes, className) {
-    return 'class' in attributes && attributes.class.split(" ").includes(className)
-}
 
-function getTracks(pageContent) {
-    let currentState = ""
-    let currentTrack = ""
 
-    let pageDoc = new DOMParser().parseFromString(pageContent, 'text/html')
-    console.log(pageDoc)
-    let tracks = Array.from(pageDoc.getElementsByClassName("chart_row-content-title")).map(t => t.textContent.trim().slice(0, -1*("Lyrics").length).trim())
 
-    return tracks   
-}
