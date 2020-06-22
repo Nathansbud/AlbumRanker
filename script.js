@@ -4,14 +4,16 @@ const OK = 200
 const NOT_FOUND = 404
 
 var testButton = document.getElementById("test_button")
-testButton.addEventListener('click', getAlbum)
+testButton.addEventListener('click', function() {
+    getAlbum()
+})
 
-function getAlbum(artist="Feed Me Jack", album="Chumpfrey") {
+function getAlbum(artist="Feed Me Jack", album="Chumpfrey") { 
     album = geniusClean(album)
     artist = geniusClean(artist)
     
     let xhr = new XMLHttpRequest()
-    xhr.open("GET", `https://genius.com/albums/${artist}/${album}`)
+    xhr.open("GET", `https://cors-anywhere.herokuapp.com/https://genius.com/albums/${artist}/${album}`)
     xhr.onreadystatechange = function() {
         if(xhr.readyState === DONE) {
             if(xhr.status === OK) {
