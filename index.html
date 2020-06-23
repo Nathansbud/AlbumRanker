@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Full credit to https://musicsort.tumblr.com/punisher for this idea! Thanks! -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Album Ranker</title>
+    <title>Album Track Ranker</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -27,16 +28,18 @@
         <table id="battle-table">
            <tr>
                 <td rowspan="2" class="battle-option" id="battle-left">Dad</td>
-                <td id="option-both">Both</td>
                 <td rowspan="2" class="battle-option" id="battle-right">Daddy</td>
            </tr>
-           <tr>
-               <td id="option-neither">No Opinion</td>
-           </tr>
         </table>
-        <ul id='song-list'>
-            
-        </ul>
+    </div>
+    <div class="hidden" id="results">
+        <h2>Your <i><span class='album-name'></i></span> Track Ranking:</h2>
+        <table id="results-table">
+            <tr>
+                <th>#</th>
+                <th>Track Name</th>
+            </tr>     
+        </table>
     </div>
     <script src="script.js"></script>
 </body>
