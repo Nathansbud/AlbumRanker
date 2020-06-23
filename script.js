@@ -42,16 +42,33 @@ Array.from(document.getElementsByClassName('battle-option')).forEach(bo => bo.ad
 
 function processBattle(cArr, winner, loser) {
     console.log({winner: winner, loser: loser})
-    console.log(cArr, processSet)
+    console.log(["Current Array", cArr])
     if(albumRanking.length < albumTracks.length) {
         if(cArr.length > 1) {
-            if(cArr.includes(loser)) processSet = cArr.slice(cArr.indexOf(loser)+1)
-            else processSet = cArr.slice(0, cArr.indexOf(winner))
+            if(cArr.includes(loser)) {
+                if(cArr.indexOf(loser) < cArr.length - 1) {
+                    processSet = cArr.slice(cArr.indexOf(loser)+1)
+                } else {
+                    albumRanking.push(winner)
+                }
+            } else {
+                if(cArr.indexOf(winner) == 0) {
+                    albumRanking.unshift(loser)
+                } else {
+                    processSet = cArr.slice(0, cArr.indexOf(winner))
+                }
+            }
             
             setBattle(processSet[Math.floor(processSet.length / 2)], (cArr.includes(loser)) ? (winner) : (loser))
         } else if(cArr.length == 1) {
-            if(cArr.includes(loser)) albumRanking.splice(cArr.indexOf(loser) + 1, 0, winner)
-            else albumRanking.splice(cArr.indexOf(winner) - 1, 0, loser)
+            if(cArr.includes(loser)) albumRanking.splice(albumRanking.indexOf(loser) + 1, 0, winner)
+            else {
+                if(albumRanking.indexOf(winner) > 0) {
+                    albumRanking.splice(albumRanking.indexOf(winner) - 1, 0, loser)
+                } else {
+                    albumRanking.unshift(loser)
+                }
+            }
             
             processSet = []        
             setBattle(albumRanking[Math.floor(albumRanking.length / 2)], albumTracks[++processedIndex])
@@ -73,19 +90,19 @@ function processBattle(cArr, winner, loser) {
                     if(albumRanking.includes(winner)) {
                         processSet = albumRanking.slice(0, albumRanking.indexOf(winner))
                     } else {
-                        console.log(albumRanking.indexOf(loser))
                         processSet = albumRanking.slice(albumRanking.indexOf(loser) + 1)
                     }
                 } else {
                     if(processSet.includes(winner)) {
-                        processSet = processSet.slice(0, processSet.indexOf(winner))
+                        processSet = cArr.slice(0, cArr.indexOf(winner))
                     } else {
-                        processSet = processSet.slice(processSet.indexOf(loser) + 1)
+                        processSet = cArr.slice(cArr.indexOf(loser) + 1)
                     }
                 }
                 setBattle(processSet[Math.floor(processSet.length / 2)], albumTracks[processedIndex])
             }
         }
+        console.log(["Rankings", processSet])
         console.log(albumRanking)
     } 
     
@@ -140,6 +157,7 @@ async function startApp(artist, album) {
             show(bracketDiv)
         } else {
             hide(loading)
+            albumForm.reset()
             alert(`Album ${album} by ${artist} not found on Genius!`)
         }
     }
