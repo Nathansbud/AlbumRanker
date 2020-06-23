@@ -48,23 +48,27 @@ function processBattle(cArr, winner, loser) {
             if(cArr.includes(loser)) {
                 if(cArr.indexOf(loser) < cArr.length - 1) {
                     processSet = cArr.slice(cArr.indexOf(loser)+1)
+                    setBattle(processSet[Math.floor(processSet.length / 2)], (cArr.includes(loser)) ? (winner) : (loser))
                 } else {
-                    albumRanking.push(winner)
+                    albumRanking.splice(albumRanking.indexOf(loser)+1, 0, winner)
+                    processSet = []
+                    setBattle(albumRanking[Math.floor(albumRanking.length / 2)], albumTracks[++processedIndex])
                 }
             } else {
                 if(cArr.indexOf(winner) == 0) {
-                    albumRanking.unshift(loser)
+                    albumRanking.splice(albumRanking.indexOf(winner), 0, loser)
+                    processSet = []
+                    setBattle(albumRanking[Math.floor(albumRanking.length / 2)], albumTracks[++processedIndex])
                 } else {
                     processSet = cArr.slice(0, cArr.indexOf(winner))
+                    setBattle(processSet[Math.floor(processSet.length / 2)], (cArr.includes(loser)) ? (winner) : (loser))
                 }
             }
-            
-            setBattle(processSet[Math.floor(processSet.length / 2)], (cArr.includes(loser)) ? (winner) : (loser))
         } else if(cArr.length == 1) {
             if(cArr.includes(loser)) albumRanking.splice(albumRanking.indexOf(loser) + 1, 0, winner)
             else {
                 if(albumRanking.indexOf(winner) > 0) {
-                    albumRanking.splice(albumRanking.indexOf(winner) - 1, 0, loser)
+                    albumRanking.splice(albumRanking.indexOf(winner), 0, loser)
                 } else {
                     albumRanking.unshift(loser)
                 }
@@ -83,6 +87,7 @@ function processBattle(cArr, winner, loser) {
                 } else {
                     albumRanking.push(winner)
                 }
+                processSet = []
                 setBattle(albumRanking[1], albumTracks[++processedIndex])
             } else {
                 //there's a bug right now to do with out of bounds but i'm literally so tired i can't keep my eyes open
@@ -102,7 +107,7 @@ function processBattle(cArr, winner, loser) {
                 setBattle(processSet[Math.floor(processSet.length / 2)], albumTracks[processedIndex])
             }
         }
-        console.log(["Rankings", processSet])
+        console.log(["Process Set", processSet])
         console.log(albumRanking)
     } 
     
@@ -120,7 +125,7 @@ function processBattle(cArr, winner, loser) {
         }
 
         setBattle("--", "--")
-        albumRanking.forEach((st, idx) => resultsTable.appendChild(createSongRow(st, idx+1)))
+        albumRanking.reverse().forEach((st, idx) => resultsTable.appendChild(createSongRow(st, idx+1)))
         hide(bracketDiv)
         show(resultsDiv)
     }
