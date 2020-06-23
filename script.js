@@ -1,4 +1,3 @@
-
 const DONE = 4
 const OK = 200
 const NOT_FOUND = 404
@@ -17,6 +16,8 @@ var lr = ["battle-left", "battle-right"]
 
 var resultsDiv = document.getElementById('results')
 var resultsTable = document.getElementById('results-table')
+var copyButton = document.getElementById('copy-button')
+var restartButton = document.getElementById('restart-button')
 
 var albumTracks = []
 var albumRanking = []
@@ -39,6 +40,22 @@ albumForm.addEventListener('submit', function() {
 Array.from(document.getElementsByClassName('battle-option')).forEach(bo => bo.addEventListener('click', function() {
     processBattle(processSet, bo.textContent, document.getElementById((lr.indexOf(bo.getAttribute('id')) == 0) ? (lr[1]) : (lr[0])).textContent)
 }))
+
+Array.from(document.getElementsByClassName('restart-button')).forEach(rb => rb.addEventListener('click', restart))
+
+function restart() {
+    albumTracks = []
+    albumRanking = []
+    processedIndex = 0
+    processSet = []
+    
+    resultsTable.innerHTML = "<tr><th>#</th><th>Track Name</th></tr>" //drop all non-header
+    albumForm.reset()
+
+    hide(bracketDiv)
+    hide(resultsDiv)
+    show(formDiv)
+}
 
 function processBattle(cArr, winner, loser) {
     console.log({winner: winner, loser: loser})
@@ -165,9 +182,10 @@ function setBattle(left, right) {
 
 async function startApp(artist, album) {
     if(artist && album) {
-        show(loading)
+        show(loadingAnimation)
         for(let an of document.getElementsByClassName("album-name")) an.textContent = album
         albumTracks = await getAlbumTracks(artist, album)
+        hide(loadingAnimation)
         if(albumTracks.length > 1) {
             document.getElementById("battle-tracks").textContent = albumTracks.join(", ")
             albumTracks = shuffle(albumTracks) //shuffle so things are kept spicy
@@ -180,7 +198,6 @@ async function startApp(artist, album) {
             albumRanking = albumTracks 
             showResults()
         } else {
-            hide(loading)
             albumForm.reset()
             alert(`Album ${album} by ${artist} not found on Genius!`)
         }
@@ -215,3 +232,21 @@ function shuffle(arr) {
     }
     return arr
 }
+
+//html2canvas trick: https://stackoverflow.com/questions/41440762/copy-div-with-mixed-content-as-image-to-clipboard
+//iframe trick: https://ourcodeworld.com/articles/read/682/what-does-the-not-allowed-to-navigate-top-frame-to-data-url-javascript-exception-means-in-google-chrome
+
+copyButton.addEventListener('click', function() {
+    html2canvas(resultsTable).then(function(canvas) {
+        let image = new Image();
+        image.id = "results-pic"
+        image.src = canvas.toDataURL()
+        image.height = resultsTable.clientHeight
+        image.width = resultsTable.clientWidth
+        function debugBase64(base64URL){
+            var win = window.open();
+            win.document.write('<iframe src="' + base64URL  + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
+        }
+        debugBase64(image.src, 'Meme')
+    })
+})

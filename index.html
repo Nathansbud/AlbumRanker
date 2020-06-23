@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Album Track Ranker</title>
     <link rel="stylesheet" href="style.css">
+    <script defer src="http://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
 <body>
     <div id="intro">
@@ -31,6 +32,8 @@
                 <td rowspan="2" class="battle-option" id="battle-right">Daddy</td>
            </tr>
         </table>
+        <br>
+        <button class="restart-button">Restart</button>
     </div>
     <div class="hidden" id="results">
         <h2>Your <i><span class='album-name'></i></span> Track Ranking:</h2>
@@ -40,6 +43,9 @@
                 <th>Track Name</th>
             </tr>     
         </table>
+        <br>
+        <button id="copy-button">Copy Ranking as Image</button>
+        <button class="restart-button">Restart</button>
     </div>
     <script src="script.js"></script>
 </body>
