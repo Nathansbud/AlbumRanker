@@ -125,10 +125,26 @@ function processBattle(cArr, winner, loser) {
         }
 
         setBattle("--", "--")
-        albumRanking.reverse().forEach((st, idx) => resultsTable.appendChild(createSongRow(st, idx+1)))
-        hide(bracketDiv)
-        show(resultsDiv)
+        showResults()
     }
+}
+
+function showResults() {
+    function createSongRow(st, i) {
+        let tr = document.createElement("tr")
+        
+        let trackRank = document.createElement("td")
+        trackRank.textContent = i
+        let trackName = document.createElement("td")
+        trackName.textContent = st
+        tr.appendChild(trackRank)
+        tr.appendChild(trackName)
+        return tr
+    }
+    albumRanking.reverse().forEach((st, idx) => resultsTable.appendChild(createSongRow(st, idx+1)))
+    hide(bracketDiv)
+    hide(formDiv)
+    show(resultsDiv)
 }
 
 
@@ -151,8 +167,8 @@ async function startApp(artist, album) {
     if(artist && album) {
         show(loading)
         for(let an of document.getElementsByClassName("album-name")) an.textContent = album
-        albumTracks = await getAlbumTracks(artist, album)   
-        if(albumTracks.length > 0) {
+        albumTracks = await getAlbumTracks(artist, album)
+        if(albumTracks.length > 1) {
             document.getElementById("battle-tracks").textContent = albumTracks.join(", ")
             albumTracks = shuffle(albumTracks) //shuffle so things are kept spicy
             
@@ -160,6 +176,9 @@ async function startApp(artist, album) {
             
             hide(formDiv)
             show(bracketDiv)
+        } else if(albumTracks.length == 1) {   
+            albumRanking = albumTracks 
+            showResults()
         } else {
             hide(loading)
             albumForm.reset()
