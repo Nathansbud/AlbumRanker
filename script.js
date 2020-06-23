@@ -21,8 +21,14 @@ var restartButton = document.getElementById('restart-button')
 
 var albumTracks = []
 var albumRanking = []
+var equalSet = {
+    
+}
 var processSet = []
 var processedIndex = 0
+
+var getEqualLength = () => Object.values(equalSet).reduce((acc, v) => acc + v.length, 0)
+const reducer = (accumulator, currentValue) => accumulator + currentValue;
 
 
 Document.prototype.createElementWithText = function(tagName, text) {
@@ -38,7 +44,11 @@ albumForm.addEventListener('submit', function() {
 })
 
 Array.from(document.getElementsByClassName('battle-option')).forEach(bo => bo.addEventListener('click', function() {
-    processBattle(processSet, bo.textContent, document.getElementById((lr.indexOf(bo.getAttribute('id')) == 0) ? (lr[1]) : (lr[0])).textContent)
+    if(bo.getAttribute('id') == 'battle-equal') {
+        processBattle(processSet, leftOption.textContent, rightOption.textContent, true)
+    } else {
+        processBattle(processSet, bo.textContent, document.getElementById((lr.indexOf(bo.getAttribute('id')) == 0) ? (lr[1]) : (lr[0])).textContent)
+    }
 }))
 
 Array.from(document.getElementsByClassName('restart-button')).forEach(rb => rb.addEventListener('click', restart))
@@ -48,6 +58,7 @@ function restart() {
     albumRanking = []
     processedIndex = 0
     processSet = []
+    equalSet = {}
     
     resultsTable.innerHTML = "<tr><th>#</th><th>Track Name</th></tr>" //drop all non-header
     albumForm.reset()
@@ -57,96 +68,133 @@ function restart() {
     show(formDiv)
 }
 
-function processBattle(cArr, winner, loser) {
+
+function processBattle(cArr, winner, loser, equal=false) {
     console.log({winner: winner, loser: loser})
     console.log(["Current Array", cArr])
-    if(albumRanking.length < albumTracks.length) {
-        if(cArr.length > 1) {
-            if(cArr.includes(loser)) {
-                if(cArr.indexOf(loser) < cArr.length - 1) {
-                    processSet = cArr.slice(cArr.indexOf(loser)+1)
-                    setBattle(processSet[Math.floor(processSet.length / 2)], (cArr.includes(loser)) ? (winner) : (loser))
-                } else {
-                    albumRanking.splice(albumRanking.indexOf(loser)+1, 0, winner)
-                    processSet = []
-                    setBattle(albumRanking[Math.floor(albumRanking.length / 2)], albumTracks[++processedIndex])
-                }
-            } else {
-                if(cArr.indexOf(winner) == 0) {
-                    albumRanking.splice(albumRanking.indexOf(winner), 0, loser)
-                    processSet = []
-                    setBattle(albumRanking[Math.floor(albumRanking.length / 2)], albumTracks[++processedIndex])
-                } else {
-                    processSet = cArr.slice(0, cArr.indexOf(winner))
-                    setBattle(processSet[Math.floor(processSet.length / 2)], (cArr.includes(loser)) ? (winner) : (loser))
-                }
-            }
-        } else if(cArr.length == 1) {
-            if(cArr.includes(loser)) albumRanking.splice(albumRanking.indexOf(loser) + 1, 0, winner)
-            else {
-                if(albumRanking.indexOf(winner) > 0) {
-                    albumRanking.splice(albumRanking.indexOf(winner), 0, loser)
-                } else {
-                    albumRanking.unshift(loser)
-                }
-            }
-            
-            processSet = []        
-            setBattle(albumRanking[Math.floor(albumRanking.length / 2)], albumTracks[++processedIndex])
+    if(equal) {
+        if(albumRanking.length == 0) {
+            albumRanking.push(winner)
+            processedIndex += 1
+            equalSet[winner] = [loser]
         } else {
-            if(albumRanking.length == 0) {
-                albumRanking.push(loser, winner)
-                processedIndex += 2
-                setBattle(albumRanking[1], albumTracks[processedIndex])
-            } else if(albumRanking.length == 2) {
-                if(albumRanking.includes(winner)) {
-                    albumRanking.splice(1, 0, loser)
+            if(albumRanking.includes(winner)) {
+                if(equalSet[winner]) {
+                    equalSet[winner].push(loser)
                 } else {
-                    albumRanking.push(winner)
+                    equalSet[winner] = [loser]   
                 }
-                processSet = []
-                setBattle(albumRanking[1], albumTracks[++processedIndex])
             } else {
-                //there's a bug right now to do with out of bounds but i'm literally so tired i can't keep my eyes open
-                if(processSet.length == 0) {
-                    if(albumRanking.includes(winner)) {
-                        processSet = albumRanking.slice(0, albumRanking.indexOf(winner))
-                    } else {
-                        processSet = albumRanking.slice(albumRanking.indexOf(loser) + 1)
-                    }
+                if(equalSet[loser]) {
+                    equalSet[loser].push(winner)
                 } else {
-                    if(processSet.includes(winner)) {
-                        processSet = cArr.slice(0, cArr.indexOf(winner))
-                    } else {
-                        processSet = cArr.slice(cArr.indexOf(loser) + 1)
-                    }
+                    equalSet[loser] = [winner]   
                 }
-                setBattle(processSet[Math.floor(processSet.length / 2)], albumTracks[processedIndex])
             }
         }
-        console.log(["Process Set", processSet])
-        console.log(albumRanking)
-    } 
-    
-    if(albumRanking.length == albumTracks.length) {
-        function createSongRow(st, i) {
-            let tr = document.createElement("tr")
-            
-            let trackRank = document.createElement("td")
-            trackRank.textContent = i
-            let trackName = document.createElement("td")
-            trackName.textContent = st
-            tr.appendChild(trackRank)
-            tr.appendChild(trackName)
-            return tr
-        }
+        processSet = []
+        console.log(equalSet)
+        setBattle(albumRanking[Math.floor(albumRanking.length / 2)], albumTracks[++processedIndex])
+    } else { 
+        if(albumRanking.length < albumTracks.length+getEqualLength()) {
+            console.log("I AM HERE")
+            if(cArr.length > 1) {
+                if(cArr.includes(loser)) {
+                    if(cArr.indexOf(loser) < cArr.length - 1) {
+                        processSet = cArr.slice(cArr.indexOf(loser)+1)
+                        setBattle(processSet[Math.floor(processSet.length / 2)], (cArr.includes(loser)) ? (winner) : (loser))
+                    } else {
+                        albumRanking.splice(albumRanking.indexOf(loser)+1, 0, winner)
+                        processSet = []
+                        setBattle(albumRanking[Math.floor(albumRanking.length / 2)], albumTracks[++processedIndex])
+                    }
+                } else {
+                    if(cArr.indexOf(winner) == 0) {
+                        albumRanking.splice(albumRanking.indexOf(winner), 0, loser)
+                        processSet = []
+                        setBattle(albumRanking[Math.floor(albumRanking.length / 2)], albumTracks[++processedIndex])
+                    } else {
+                        processSet = cArr.slice(0, cArr.indexOf(winner))
+                        setBattle(processSet[Math.floor(processSet.length / 2)], (cArr.includes(loser)) ? (winner) : (loser))
+                    }
+                }
+            } else if(cArr.length == 1) {
+                if(cArr.includes(loser)) albumRanking.splice(albumRanking.indexOf(loser) + 1, 0, winner)
+                else {
+                    if(albumRanking.indexOf(winner) > 0) {
+                        albumRanking.splice(albumRanking.indexOf(winner), 0, loser)
+                    } else {
+                        albumRanking.unshift(loser)
+                    }
+                }
+                
+                processSet = []        
+                setBattle(albumRanking[Math.floor(albumRanking.length / 2)], albumTracks[++processedIndex])
+            } else {
+                if(albumRanking.length == 0) {
+                    albumRanking.push(loser, winner)
+                    processedIndex += 2
+                    setBattle(albumRanking[1], albumTracks[processedIndex])
+                } else if(albumRanking.length == 1) {
+                    if(albumRanking.includes(winner)) {
+                        albumRanking.splice(albumRanking.indexOf(winner), 0, loser)
+                    } else {
+                        albumRanking.push(winner)
+                    }
 
+                    processSet = []
+                    setBattle(albumRanking[Math.floor(albumRanking.length / 2)], albumTracks[++processedIndex])                    
+                } else if(albumRanking.length == 2) {
+                    if(albumRanking.includes(winner)) {
+                        albumRanking.splice(1, 0, loser)
+                    } else {
+                        albumRanking.push(winner)
+                    }
+                    processSet = []
+                    setBattle(albumRanking[Math.floor(albumRanking.length / 2)], albumTracks[++processedIndex])
+                } else {
+                    if(processSet.length == 0) {
+                        if(albumRanking.includes(winner)) {
+                            processSet = albumRanking.slice(0, albumRanking.indexOf(winner))
+                        } else {
+                            processSet = albumRanking.slice(albumRanking.indexOf(loser) + 1)
+                        }
+                    } else {
+                        if(processSet.includes(winner)) {
+                            processSet = cArr.slice(0, cArr.indexOf(winner))
+                        } else {
+                            processSet = cArr.slice(cArr.indexOf(loser) + 1)
+                        }
+                    }
+                    setBattle(processSet[Math.floor(processSet.length / 2)], albumTracks[processedIndex])
+                }
+            }
+          
+        }
+    } 
+    console.log({equalRanking: equalSet, equalLength: getEqualLength(), ranking: albumRanking, rankingLength: albumRanking.length})
+    
+    let totalLength = getEqualLength() + albumRanking.length
+
+    if(totalLength == albumTracks.length) {
         setBattle("--", "--")
         showResults()
     }
 }
 
 function showResults() {
+    let ranking = albumRanking.reverse()
+    let modRanking = []
+    for(let i = 0; i < ranking.length; i++) {
+        modRanking.push({name: ranking[i], rank: i+1})
+        if(ranking[i] in equalSet) equalSet[ranking[i]].map(x => [{name: x, rank: i+1}]).forEach(es => modRanking.push(es[0]))
+    }
+    console.log(modRanking)
+    
+    
+
+
+
     function createSongRow(st, i) {
         let tr = document.createElement("tr")
         
@@ -158,7 +206,8 @@ function showResults() {
         tr.appendChild(trackName)
         return tr
     }
-    albumRanking.reverse().forEach((st, idx) => resultsTable.appendChild(createSongRow(st, idx+1)))
+
+    modRanking.forEach(mr => resultsTable.appendChild(createSongRow(mr.name, mr.rank)))
     hide(bracketDiv)
     hide(formDiv)
     show(resultsDiv)
