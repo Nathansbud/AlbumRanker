@@ -28,8 +28,6 @@ var processSet = []
 var processedIndex = 0
 
 var getEqualLength = () => Object.values(equalSet).reduce((acc, v) => acc + v.length, 0)
-const reducer = (accumulator, currentValue) => accumulator + currentValue;
-
 
 Document.prototype.createElementWithText = function(tagName, text) {
     let elem = this.createElement(tagName)
