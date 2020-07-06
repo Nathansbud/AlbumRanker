@@ -214,7 +214,7 @@ function showResults() {
 
 async function getAlbumTracks(artist, album) {
     //probably shouldn't use cors-anywhere but idk why it ain't working from ghp
-    const response = await fetch(`https://cors-anywhere.herokuapp.com/https://genius.com/albums/${geniusClean(artist)}/${geniusClean(album)}`)
+    const response = await fetch(`https://dork.nathansbud-cors.workers.dev/?https://genius.com/albums/${geniusClean(artist)}/${geniusClean(album)}`)
     
     const pageContent = new DOMParser().parseFromString(await response.text(), 'text/html')
     let tracks = Array.from(pageContent.getElementsByClassName("chart_row-content-title")).map(t => t.textContent.trim().slice(0, -1*("Lyrics").length).trim())
