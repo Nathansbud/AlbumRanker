@@ -240,10 +240,19 @@ function showResults() {
 async function getAlbumTracks(artist, album) {
     //probably shouldn't use cors-anywhere but idk why it ain't working from ghp
     const response = await fetch(`https://dork.nathansbud-cors.workers.dev/?https://genius.com/albums/${geniusClean(artist)}/${geniusClean(album)}`)
-    
-    const pageContent = new DOMParser().parseFromString(await response.text(), 'text/html')
-    let tracks = Array.from(pageContent.getElementsByClassName("chart_row-content-title")).map(t => t.textContent.trim().slice(0, -1*("Lyrics").length).trim())
-    return tracks
+    const body = await response.text()
+    console.log(response, body)
+    try {
+        const pageContent = new DOMParser().parseFromString(body, 'text/html')
+        console.log(pageContent)
+        const tracks = Array.from(pageContent.getElementsByClassName("chart_row-content-title")).map(t => t.textContent.trim().slice(0, -1*("Lyrics").length).trim())
+        console.log(tracks)
+        return tracks
+    } catch(e) {
+        console.log(e)
+    }
+
+    return []
 }
 
 function setBattle(left, right) {
