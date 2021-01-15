@@ -243,10 +243,10 @@ async function getAlbumTracks(artist, album) {
     const body = await response.text()
     console.log(response, body)
     try {
-        const pageContent = new DOMParser().parseFromString(body, 'text/html')
-        console.log(pageContent)
-        const tracks = Array.from(pageContent.getElementsByClassName("chart_row-content-title")).map(t => t.textContent.trim().slice(0, -1*("Lyrics").length).trim())
-        console.log(tracks)
+        const pageContent = new DOMParser().parseFromString(body, 'text/html')        
+        const className = (pageContent.getElementsByClassName("chart_row-content-title").length > 0) ? ("chart_row-content-title") : ("tracklist_row-header-content-title")
+        const tracks = Array.from(pageContent.getElementsByClassName(className)).map(t => t.textContent.trim().slice(0, -1*("Lyrics").length).trim())
+        console.log(`Tracks: ${tracks}`)
         return tracks
     } catch(e) {
         console.log(e)
